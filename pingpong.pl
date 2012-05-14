@@ -6,15 +6,15 @@ use MIME::Base64;
 
 sub our_encode_base64 {
 	my $tmp = encode_base64(@_[0]);
-	$tmp =~ s/\+/[/;
-	$tmp =~ s/\//]/;
+	$tmp =~ s/\+/[/g;
+	$tmp =~ s/\//]/g;
 	$tmp;
 }
 
 sub our_decode_base64 {
 	my $tmp = @_[0];
-	$tmp =~ s/\[/+/;
-	$tmp =~ s/\]/\//;
+	$tmp =~ s/\[/+/g;
+	$tmp =~ s/\]/\//g;
 	$tmp = decode_base64($tmp);
 	$tmp;
 }
