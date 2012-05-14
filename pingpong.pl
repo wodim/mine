@@ -2,42 +2,29 @@
 
 use strict;
 use Crypt::OpenSSL::AES;
+use MIME::Base64;
 
-# estas dos funciones son basadas en http://www.perlmonks.org/bare/?node_id=524331
-# no puedo usar MIME::Base64 porque en hispano son muy especialitos y tienen
-# que usar un base64 modificado
-sub encode_base64 {
-	my $s = shift;
-	my $r = "";
-	while ($s =~ /(.{1,45})/gs) {
-		chop($r .= substr(pack("u", $1), 1));
-	}
-	my $pad = (3 - length($s)%3)%3;
-	$r =~ tr|` -_|AA-Za-z0-9\[\]|;
-	$r =~ s/.{$pad}$/"="x$pad/e if $pad;
-	$r =~ s/(.{1,72})/$1\n/g;
-	$r;
+sub our_encode_base64 {
+	my $tmp = encode_base64(@_[0]);
+	$tmp =~ s/\+/[/;
+	$tmp =~ s/\//]/;
+	$tmp;
 }
 
-sub decode_base64 {
-	my $d = shift;
-	$d =~ tr!A-Za-z0-9\[\]!!cd;
-	$d =~ s/=+$//;
-	$d =~ tr!A-Za-z0-9\[\]! -_!;
-	my $r = '';
-	while ($d =~ /(.{1,60})/gs){
-		my $len = chr(32 + length($1) * 3 / 4);
-		$r .= unpack("u", $len.$1);
-	}
-	$r;
+sub our_decode_base64 {
+	my $tmp = @_[0];
+	$tmp =~ s/\[/+/;
+	$tmp =~ s/\]/\//;
+	$tmp = decode_base64($tmp);
+	$tmp;
 }
 
 sub descifrar {
 	# 0: ping
 	# 1: key
 
-	my $d_ping = decode_base64 @_[0];
-	my $d_key = decode_base64 @_[1];
+	my $d_ping = our_decode_base64 @_[0];
+	my $d_key = our_decode_base64 @_[1];
 
 	my $tmp_key = substr($d_key, 0, 24).substr($d_ping, 0, 8);
 	my $tmp_msg = substr($d_ping, 8, 16);
@@ -52,7 +39,7 @@ sub descifrar {
 
 	my $pong = $random.substr($tmp_msg, 0, 16);
 
-	encode_base64 $pong;
+	our_encode_base64 $pong;
 }
 
 my $ping = $ARGV[0];
