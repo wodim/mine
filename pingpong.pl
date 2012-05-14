@@ -3,6 +3,7 @@
 use strict;
 use Crypt::OpenSSL::AES;
 use MIME::Base64;
+use Digest::MD5;
 
 sub our_encode_base64 {
 	my $tmp = encode_base64(@_[0]);
@@ -31,8 +32,7 @@ sub descifrar {
 	my $aes_ctx_1 = new Crypt::OpenSSL::AES($tmp_key);
 	my $tmp_msg = uc $aes_ctx_1->decrypt($tmp_msg);
 
-	# debería ser al azar y no esta mierda, pero bueno.
-	my $random = "aqualung";
+	my $random = substr(Digest::MD5::md5_hex(rand), 0, 8);
 	$tmp_key = substr($tmp_key, 0, 24).$random;
 	my $aes_ctx_2 = new Crypt::OpenSSL::AES($tmp_key);
 	$tmp_msg = $aes_ctx_2->encrypt($tmp_msg);
