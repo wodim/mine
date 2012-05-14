@@ -42,6 +42,9 @@ sub descifrar {
 	our_encode_base64 $pong;
 }
 
+print "Uso: $0 [ping cifrado]\nEjemplo: $0 NYpg0VoE13CbcyvqjoVQqs65bG9E4xFJ\n"
+	and exit unless $ARGV[0] =~ m/^:?[a-zA-Z0-9\[\]]{32}$/;
+
 my $ping = $ARGV[0];
 $ping =~ s/^:?//;
 print "PONG :".descifrar($ping,
