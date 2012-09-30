@@ -61,7 +61,9 @@ while (my $input = <$sock>) {
 		my $decoded_json = decode_json($json);
 		my $user = $decoded_json->{user}{screen_name};
 		my $tweet = $decoded_json->{text};
-		print $sock "PRIVMSG $channel :Tweet de \x02\@$user\x02: $tweet\r\n";
+		$output = "PRIVMSG $channel :Tweet de \x02\@$user\x02: $tweet";
+		$output =~ s/\r|\n/ /g;
+		print $sock "$output\r\n";
 	} elsif ($input =~ /^ERROR\s:(.*)$/i) {
 		print "ERROR: $1\n";
 	}
