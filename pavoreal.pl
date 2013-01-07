@@ -49,9 +49,9 @@ while (my $input = <$sock>) {
                 $last = time;
 		print $sock "PRIVMSG $channel :$1: a mí me dejas en paz\r\n";
 	} elsif ($input =~ /^:.*!.*@.*\sPRIVMSG\s$channel\s:.*https?:\/\/(www\.)?twitter\.com\/(\#!\/)?[a-zA-Z0-9_]+\/status(es)?\/(\d+)/i) {
-                next if ($last > (time - 2));
-                $last = time;
-		my $requrl = "https://api.twitter.com/1/statuses/show.json?id=$4";
+		next if ($last > (time - 2));
+		$last = time;
+		my $requrl = "https://api.twitter.com/1/statuses/show.json?id=$4&include_entities=1";
 		my $json = get($requrl);
 		if (!$json) {
 			# tampoco nos vamos a poner flamencos para mirar qué ha fallado, habrase visto
@@ -61,9 +61,11 @@ while (my $input = <$sock>) {
 		my $decoded_json = decode_json($json);
 		my $user = $decoded_json->{user}{screen_name};
 		my $tweet = $decoded_json->{text};
-		$output = "PRIVMSG $channel :Tweet de \x02\@$user\x02: $tweet";
-		$output =~ s/\r|\n/ /g;
-		print $sock "$output\r\n";
+		foreach (@{$decoded_json->{entities}{urls}}) {
+			$tweet =~ s/$_->{url}/$_->{expanded_url}/;
+		}
+		$tweet =~ s/\r|\n/ /g;
+		print $sock "PRIVMSG $channel :Tweet de \x02\@$user\x02: $tweet\r\n";
 	} elsif ($input =~ /^ERROR\s:(.*)$/i) {
 		print "ERROR: $1\n";
 	}
