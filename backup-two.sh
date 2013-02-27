@@ -27,7 +27,7 @@ mkdir tmp
 mkdir tmp/logs-${date}
 for network in /home/user/irclogs/*; do cp -r $network tmp/logs-${date}/$(echo $network | cut - -d/ -f6-); done
 tar Jcf tmp/logs-${date}.tar.xz tmp/logs-${date}
-rm -rf tmp/logs-${date}/
+rm -rf tmp/logs-${date}/ /home/user/irclogs/
 
 # irssi configuration :-P
 tar Jcf tmp/irssi-${date}.tar.xz -C /home/user/.irssi/ .
