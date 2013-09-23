@@ -37,8 +37,8 @@ sub descifrar {
 	# 0: ping
 	# 1: key
 
-	my $d_ping = our_decode_base64 @_[0];
-	my $d_key = our_decode_base64 @_[1];
+	my $d_ping = our_decode_base64(@_[0]);
+	my $d_key = our_decode_base64(@_[1]);
 
 	my $tmp_key = substr($d_key, 0, 24).substr($d_ping, 0, 8);
 	my $tmp_msg = substr($d_ping, 8, 16);
@@ -52,7 +52,7 @@ sub descifrar {
 
 	my $pong = $random.substr($tmp_msg, 0, 16);
 
-	our_encode_base64 $pong;
+	our_encode_base64($pong);
 }
 
 sub event_ping {
